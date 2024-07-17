@@ -25,6 +25,7 @@
         colored ghost at the precise location of the click and places a JavaScript
         reference to that ghost into the ghosts array*/
         document.addEventListener("click", summonGhost, false);
+        document.addEventListener("mousemove", ghostLooks, false);
         function summonGhost (event) {
             let cx = event.offsetX;
             let cy = event.offsetY;
@@ -46,7 +47,7 @@
             ghost.appendChild(createCircle(cx, cy + bodyHeight, bodyWidth / 6, color));
             ghost.appendChild(createCircle(cx + bodyWidth / 3, cy + bodyHeight, bodyWidth / 6, color));
             canvas.appendChild(ghost);
-            ghosts.push(ghost);         
+            ghosts.push(ghost);      
         }
         function createCircle(cx, cy, r, color) {
             let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle")
@@ -59,9 +60,35 @@
         /* You'll need a mousemove listener on the canvas that makes the eyes
         of each ghost in the ghosts array move in the direction of the current
         mouse coordinates */
-        document.addEventListener("mousemove", ghostLooks, false);
+       
         function ghostLooks(event) {
+            xPos = event.offsetX;
+            yPos = event.offsetY;
+            for (ghost of ghosts) {
+                for(let i = 3; i < 5; i++) {
+                    let eye = ghost.getElementsByTagName("circle")[i - 2];
+                    let pupil = ghost.getElementsByTagName("circle")[i];
+                    let cx = Number(eye.getAttribute("cx"));
+                    let cy = Number(eye.getAttribute("cy"));
+                    let dxPupil = 0
+                    let dyPupil = 0
+                    if (cx == xPos) {
+                        dyPupil = Math.sign(yPos - cy) * (eyeRadius - pupilRadius);
+                    } 
+                    else {
+                        let m = (yPos - cy) / (xPos - cx);
+                        dxPupil = Math.sign(xPos - cx) * (eyeRadius - pupilRadius) / Math.sqrt(1 + m * m);
+                        dyPupil = m * dxPupil
+                    }
+                    let newXPupil = dxPupil + cx;
+                    let newYPupil = dyPupil + cy;
+                    pupil.setAttribute("cx", newXPupil.toString());
+                    pupil.setAttribute("cy", newYPupil.toString());
+
+                }
+            }
         }
+
     </script>
 </body>
 </html>
